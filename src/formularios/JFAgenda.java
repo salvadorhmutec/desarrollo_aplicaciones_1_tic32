@@ -5,17 +5,98 @@
  */
 package formularios;
 
+import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Zeo
  */
 public class JFAgenda extends javax.swing.JFrame {
 
+    private Connection conexion;
+    private Statement st;
+    private ResultSet rs;
+
+    public void Conectar() {
+        try {
+            conexion = DriverManager.getConnection("jdbc:mysql://localhost/agenda_tic32", "tic32", "Tic.32");
+            st = conexion.createStatement();
+            rs = st.executeQuery("Select * from contactos;");
+
+            rs.next();
+            llenarDatos();
+
+        } catch (SQLException err) {
+            JOptionPane.showMessageDialog(null, "Error " + err.getMessage());
+        }
+
+    }
+
+    public void llenarDatos() {
+        try {
+            this.jtf_id_contacto.setText(rs.getString("id_contacto"));
+            this.jtf_nombre.setText(rs.getString("nombre"));
+            this.jtf_apellido_paterno.setText(rs.getString("apellido_paterno"));
+            this.jtf_apellido_materno.setText(rs.getString("apellido_materno"));
+            this.jtf_email.setText(rs.getString("email"));
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error " + ex.getMessage());
+        }
+    }
+
+    public void siguienteRegistro() {
+        try {
+            if (!rs.isLast()) {
+                rs.next();
+                llenarDatos();
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error " + ex.getMessage());
+        }
+    }
+
+    public void anteriorRegistro() {
+        try {
+            if (!rs.isFirst()) {
+                rs.previous();
+                llenarDatos();
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error " + ex.getMessage());
+        }
+    }
+
+    public void primerRegistro() {
+        try {
+            rs.first();
+            llenarDatos();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error " + ex.getMessage());
+        }
+    }
+
+    public void ultimoRegistro() {
+        try {
+            rs.last();
+            llenarDatos();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error " + ex.getMessage());
+        }
+    }
+
     /**
      * Creates new form JFAgenda
      */
     public JFAgenda() {
         initComponents();
+        Conectar();
     }
 
     /**
@@ -39,6 +120,10 @@ public class JFAgenda extends javax.swing.JFrame {
         jl_apellido_materno = new javax.swing.JLabel();
         jtf_email = new javax.swing.JTextField();
         jl_email = new javax.swing.JLabel();
+        jb_primer_registro = new javax.swing.JButton();
+        jb_registro_anterior = new javax.swing.JButton();
+        jb_registro_siguiente = new javax.swing.JButton();
+        jb_ultimo_registro = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -70,34 +155,73 @@ public class JFAgenda extends javax.swing.JFrame {
 
         jl_email.setText("Email");
 
+        jb_primer_registro.setText("|<");
+        jb_primer_registro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jb_primer_registroActionPerformed(evt);
+            }
+        });
+
+        jb_registro_anterior.setText("<<");
+        jb_registro_anterior.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jb_registro_anteriorActionPerformed(evt);
+            }
+        });
+
+        jb_registro_siguiente.setText(">>");
+        jb_registro_siguiente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jb_registro_siguienteActionPerformed(evt);
+            }
+        });
+
+        jb_ultimo_registro.setText(">|");
+        jb_ultimo_registro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jb_ultimo_registroActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jl_titulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jl_email, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(28, 28, 28)
-                        .addComponent(jtf_email, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(36, 36, 36)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jl_email, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(28, 28, 28)
+                                .addComponent(jtf_email, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jl_apellido_materno, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jtf_apellido_materno, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jl_apellido_paterno, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jtf_apellido_paterno, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jl_nombre, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(28, 28, 28)
+                                .addComponent(jtf_nombre, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jl_id_contacto, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(28, 28, 28)
+                                .addComponent(jtf_id_contacto, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jl_apellido_materno, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(22, 22, 22)
+                        .addComponent(jb_primer_registro)
+                        .addGap(18, 18, 18)
+                        .addComponent(jb_registro_anterior)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jtf_apellido_materno, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jl_apellido_paterno, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jtf_apellido_paterno, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jl_nombre, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(28, 28, 28)
-                        .addComponent(jtf_nombre, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jl_id_contacto, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(28, 28, 28)
-                        .addComponent(jtf_id_contacto, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jb_registro_siguiente)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jb_ultimo_registro)))
                 .addContainerGap(104, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -124,7 +248,13 @@ public class JFAgenda extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jl_email)
                     .addComponent(jtf_email, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 126, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jb_primer_registro)
+                    .addComponent(jb_registro_anterior)
+                    .addComponent(jb_registro_siguiente)
+                    .addComponent(jb_ultimo_registro))
+                .addGap(0, 92, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -140,6 +270,22 @@ public class JFAgenda extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jb_registro_siguienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_registro_siguienteActionPerformed
+        siguienteRegistro();
+    }//GEN-LAST:event_jb_registro_siguienteActionPerformed
+
+    private void jb_primer_registroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_primer_registroActionPerformed
+        primerRegistro();
+    }//GEN-LAST:event_jb_primer_registroActionPerformed
+
+    private void jb_registro_anteriorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_registro_anteriorActionPerformed
+        anteriorRegistro();
+    }//GEN-LAST:event_jb_registro_anteriorActionPerformed
+
+    private void jb_ultimo_registroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_ultimo_registroActionPerformed
+        ultimoRegistro();
+    }//GEN-LAST:event_jb_ultimo_registroActionPerformed
 
     /**
      * @param args the command line arguments
@@ -178,6 +324,10 @@ public class JFAgenda extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton jb_primer_registro;
+    private javax.swing.JButton jb_registro_anterior;
+    private javax.swing.JButton jb_registro_siguiente;
+    private javax.swing.JButton jb_ultimo_registro;
     private javax.swing.JLabel jl_apellido_materno;
     private javax.swing.JLabel jl_apellido_paterno;
     private javax.swing.JLabel jl_email;
