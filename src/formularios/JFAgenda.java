@@ -10,8 +10,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -34,7 +32,7 @@ public class JFAgenda extends javax.swing.JFrame {
             llenarDatos();
 
         } catch (SQLException err) {
-            JOptionPane.showMessageDialog(null, "Error " + err.getMessage());
+            JOptionPane.showMessageDialog(null, "Error 000" + err.getMessage());
         }
 
     }
@@ -47,7 +45,7 @@ public class JFAgenda extends javax.swing.JFrame {
             this.jtf_apellido_materno.setText(rs.getString("apellido_materno"));
             this.jtf_email.setText(rs.getString("email"));
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error " + ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Error 001" + ex.getMessage());
         }
     }
 
@@ -58,7 +56,7 @@ public class JFAgenda extends javax.swing.JFrame {
                 llenarDatos();
             }
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error 002" + ex.getMessage());
         }
     }
 
@@ -69,7 +67,7 @@ public class JFAgenda extends javax.swing.JFrame {
                 llenarDatos();
             }
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error 003" + ex.getMessage());
         }
     }
 
@@ -78,7 +76,7 @@ public class JFAgenda extends javax.swing.JFrame {
             rs.first();
             llenarDatos();
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error 004" + ex.getMessage());
         }
     }
 
@@ -87,7 +85,7 @@ public class JFAgenda extends javax.swing.JFrame {
             rs.last();
             llenarDatos();
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Error " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Error 005" + ex.getMessage());
         }
     }
 
