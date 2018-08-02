@@ -10,6 +10,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -20,6 +23,7 @@ public class JFAgenda extends javax.swing.JFrame {
 
     private Connection conexion;
     private Statement st;
+    private PreparedStatement pst;
     private ResultSet rs;
 
     public void Conectar() {
@@ -27,7 +31,6 @@ public class JFAgenda extends javax.swing.JFrame {
             conexion = DriverManager.getConnection("jdbc:mysql://localhost/agenda_tic32", "tic32", "Tic.32");
             st = conexion.createStatement();
             rs = st.executeQuery("Select * from contactos;");
-
             rs.next();
             llenarDatos();
 
@@ -88,6 +91,52 @@ public class JFAgenda extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Error 005" + ex.getMessage());
         }
     }
+    
+    public void habilitarCajas(){
+        jtf_nombre.setEditable(true);
+        jtf_apellido_paterno.setEditable(true);
+        jtf_apellido_materno.setEditable(true);
+        jtf_email.setEditable(true);
+    }
+    
+    public void insertarRegistro(){
+        try {
+            String nombre = jtf_nombre.getText();
+            String apellido_paterno = jtf_apellido_paterno.getText();
+            String apellido_materno = jtf_apellido_materno.getText();
+            String email = jtf_email.getText();
+            
+            String sql = "INSERT into contactos(nombre,apellido_paterno,apellido_materno,email)"
+                    + " values(?,?,?,?);";
+            
+            pst = conexion.prepareStatement(sql);
+            pst.setString(1, nombre);
+            pst.setString(2, apellido_paterno);
+            pst.setString(3, apellido_materno);
+            pst.setString(4, email);
+            
+            pst.executeUpdate();
+            JOptionPane.showMessageDialog(this, "Registro insertado exitosamente");
+            seleccionarTodosLosRegistros();
+            
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error 006" + ex.getMessage());
+        }
+        
+    }
+    
+    public void seleccionarTodosLosRegistros(){
+        try {
+            String sql = "SELECT * FROM contactos;";
+            pst = conexion.prepareStatement(sql);
+            rs = pst.executeQuery();
+            rs.first();
+            llenarDatos();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error 007" + ex.getMessage());
+        }
+        
+    }
 
     /**
      * Creates new form JFAgenda
@@ -118,10 +167,14 @@ public class JFAgenda extends javax.swing.JFrame {
         jl_apellido_materno = new javax.swing.JLabel();
         jtf_email = new javax.swing.JTextField();
         jl_email = new javax.swing.JLabel();
+        jp_contoles_movimiento = new javax.swing.JPanel();
         jb_primer_registro = new javax.swing.JButton();
         jb_registro_anterior = new javax.swing.JButton();
         jb_registro_siguiente = new javax.swing.JButton();
         jb_ultimo_registro = new javax.swing.JButton();
+        jp_controles = new javax.swing.JPanel();
+        jb_nuevo = new javax.swing.JButton();
+        jb_insertar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -135,23 +188,30 @@ public class JFAgenda extends javax.swing.JFrame {
 
         jl_id_contacto.setText("ID");
 
+        jtf_id_contacto.setEditable(false);
         jtf_id_contacto.setText("jTextField1");
 
         jl_nombre.setText("Nombre");
 
+        jtf_nombre.setEditable(false);
         jtf_nombre.setText("jTextField1");
 
+        jtf_apellido_paterno.setEditable(false);
         jtf_apellido_paterno.setText("jTextField1");
 
         jl_apellido_paterno.setText("Apellido Paterno");
 
+        jtf_apellido_materno.setEditable(false);
         jtf_apellido_materno.setText("jTextField1");
 
         jl_apellido_materno.setText("Apellido Materno");
 
+        jtf_email.setEditable(false);
         jtf_email.setText("jTextField1");
 
         jl_email.setText("Email");
+
+        jp_contoles_movimiento.setBackground(new java.awt.Color(255, 255, 255));
 
         jb_primer_registro.setText("|<");
         jb_primer_registro.addActionListener(new java.awt.event.ActionListener() {
@@ -180,6 +240,68 @@ public class JFAgenda extends javax.swing.JFrame {
                 jb_ultimo_registroActionPerformed(evt);
             }
         });
+
+        javax.swing.GroupLayout jp_contoles_movimientoLayout = new javax.swing.GroupLayout(jp_contoles_movimiento);
+        jp_contoles_movimiento.setLayout(jp_contoles_movimientoLayout);
+        jp_contoles_movimientoLayout.setHorizontalGroup(
+            jp_contoles_movimientoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jp_contoles_movimientoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jb_primer_registro)
+                .addGap(18, 18, 18)
+                .addComponent(jb_registro_anterior)
+                .addGap(18, 18, 18)
+                .addComponent(jb_registro_siguiente)
+                .addGap(35, 35, 35)
+                .addComponent(jb_ultimo_registro)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jp_contoles_movimientoLayout.setVerticalGroup(
+            jp_contoles_movimientoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jp_contoles_movimientoLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addGroup(jp_contoles_movimientoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jb_primer_registro)
+                    .addComponent(jb_registro_anterior)
+                    .addComponent(jb_registro_siguiente)
+                    .addComponent(jb_ultimo_registro))
+                .addContainerGap(19, Short.MAX_VALUE))
+        );
+
+        jb_nuevo.setText("Nuevo");
+        jb_nuevo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jb_nuevoActionPerformed(evt);
+            }
+        });
+
+        jb_insertar.setText("Insertar");
+        jb_insertar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jb_insertarActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jp_controlesLayout = new javax.swing.GroupLayout(jp_controles);
+        jp_controles.setLayout(jp_controlesLayout);
+        jp_controlesLayout.setHorizontalGroup(
+            jp_controlesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jp_controlesLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jb_nuevo)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jb_insertar)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jp_controlesLayout.setVerticalGroup(
+            jp_controlesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jp_controlesLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jp_controlesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jb_nuevo)
+                    .addComponent(jb_insertar))
+                .addContainerGap(66, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -212,15 +334,11 @@ public class JFAgenda extends javax.swing.JFrame {
                                 .addGap(28, 28, 28)
                                 .addComponent(jtf_id_contacto, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(jb_primer_registro)
-                        .addGap(18, 18, 18)
-                        .addComponent(jb_registro_anterior)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jb_registro_siguiente)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jb_ultimo_registro)))
-                .addContainerGap(104, Short.MAX_VALUE))
+                        .addGap(19, 19, 19)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jp_contoles_movimiento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jp_controles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -246,13 +364,11 @@ public class JFAgenda extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jl_email)
                     .addComponent(jtf_email, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jb_primer_registro)
-                    .addComponent(jb_registro_anterior)
-                    .addComponent(jb_registro_siguiente)
-                    .addComponent(jb_ultimo_registro))
-                .addGap(0, 92, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jp_contoles_movimiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(33, 33, 33)
+                .addComponent(jp_controles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 32, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -284,6 +400,21 @@ public class JFAgenda extends javax.swing.JFrame {
     private void jb_ultimo_registroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_ultimo_registroActionPerformed
         ultimoRegistro();
     }//GEN-LAST:event_jb_ultimo_registroActionPerformed
+
+    private void jb_nuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_nuevoActionPerformed
+        jp_contoles_movimiento.setEnabled(false);
+        jtf_id_contacto.setText("");
+        jtf_nombre.setText("");
+        jtf_apellido_paterno.setText("");
+        jtf_apellido_materno.setText("");
+        jtf_email.setText("");
+        
+        habilitarCajas();
+    }//GEN-LAST:event_jb_nuevoActionPerformed
+
+    private void jb_insertarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_insertarActionPerformed
+        insertarRegistro();
+    }//GEN-LAST:event_jb_insertarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -322,6 +453,8 @@ public class JFAgenda extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton jb_insertar;
+    private javax.swing.JButton jb_nuevo;
     private javax.swing.JButton jb_primer_registro;
     private javax.swing.JButton jb_registro_anterior;
     private javax.swing.JButton jb_registro_siguiente;
@@ -332,6 +465,8 @@ public class JFAgenda extends javax.swing.JFrame {
     private javax.swing.JLabel jl_id_contacto;
     private javax.swing.JLabel jl_nombre;
     private javax.swing.JLabel jl_titulo;
+    private javax.swing.JPanel jp_contoles_movimiento;
+    private javax.swing.JPanel jp_controles;
     private javax.swing.JTextField jtf_apellido_materno;
     private javax.swing.JTextField jtf_apellido_paterno;
     private javax.swing.JTextField jtf_email;
